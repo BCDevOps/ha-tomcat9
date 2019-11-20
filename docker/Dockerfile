@@ -1,7 +1,7 @@
 FROM tomcat:9.0.27-jdk8-openjdk
-#FROM registry.access.redhat.com/jboss-webserver-5/webserver50-tomcat9-openshift:1.2-13
-COPY contrib/patches.patch /usr/local/tomcat/conf/
-COPY contrib/original-files.sha1 /usr/local/tomcat/conf/
+ARG LOG4J_VERSION=2.12.1
+COPY contrib/tomcat.patch /usr/local/tomcat/
+COPY contrib/tomcat.sha1 /usr/local/tomcat/
 RUN set -xe && \
     apt-get update -qq && \
     apt-get install -qq -y --no-upgrade patch && \
@@ -9,17 +9,13 @@ RUN set -xe && \
     mkdir -p /usr/local/tomcat/conf/Catalina/localhost && \
     chmod g+w /usr/local/tomcat/conf/Catalina/localhost && \
     chmod g+w /usr/local/tomcat/webapps && \
-    sha1sum --check /usr/local/tomcat/conf/original-files.sha1 --status && \
-    patch --batch --forward --quiet --unified --directory=/usr/local/tomcat/conf --input=/usr/local/tomcat/conf/patches.patch && \
-    apt-get remove -qq -y --purge patch && apt-get clean && set +x && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
-#RUN echo mv /usr/local/tomcat/conf/logging.properties  /usr/local/tomcat/conf/logging.properties.bck
-#COPY contrib/logging.properties /usr/local/tomcat/conf/
-#RUN echo mv /usr/local/tomcat/conf/server.xml  /usr/local/tomcat/conf/server.xml.bck
-#COPY contrib/server.xml /usr/local/tomcat/conf/
-#ENV JPDA_ADDRESS="8090"
-#ENV JPDA_TRANSPORT="dt_socket"
-#ENV JPDA_SUSPEND="n"
-#ENTRYPOINT ["catalina.sh", "jpda", "run"]
-
+    ( cd /usr/local/tomcat && sha1sum --check /usr/local/tomcat/tomcat.sha1 --status) && \
+    patch --batch --forward --unified  --strip=1 --directory=/usr/local/tomcat --input=/usr/local/tomcat/tomcat.patch && \
+    mkdir -p /usr/local/tomcat/log4j/lib /usr/local/tomcat/log4j/conf && \
+    curl -sSL https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/$LOG4J_VERSION/log4j-api-$LOG4J_VERSION.jar -o /usr/local/tomcat/log4j/lib/log4j-api-$LOG4J_VERSION.jar && \
+    curl -sSL https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/$LOG4J_VERSION/log4j-core-$LOG4J_VERSION.jar -o /usr/local/tomcat/log4j/lib/log4j-core-$LOG4J_VERSION.jar && \
+    curl -sSL https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-appserver/$LOG4J_VERSION/log4j-appserver-$LOG4J_VERSION.jar -o /usr/local/tomcat/log4j/lib/log4j-appserver-$LOG4J_VERSION.jar && \
+    rm /usr/local/tomcat/conf/logging.properties && \
+    curl -sSL https://repo1.maven.org/maven2/org/jolokia/jolokia-jvm/1.6.2/jolokia-jvm-1.6.2-agent.jar -o /usr/local/tomcat/bin/jolokia-jvm-1.6.2-agent.jar && \
 
 
