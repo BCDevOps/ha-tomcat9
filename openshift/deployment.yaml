@@ -6,11 +6,11 @@ objects:
   kind: ServiceAccount
   metadata:
     creationTimestamp: null
-    name: tomcat
+    name: ${NAME}${SUFFIX}
 - kind: Role
   apiVersion: rbac.authorization.k8s.io/v1
   metadata:
-    name: tomcat
+    name: ${NAME}${SUFFIX}
   rules:
   - apiGroups: [""] # "" indicates the core API group
     resources: ["pods"]
@@ -19,14 +19,14 @@ objects:
   kind: RoleBinding
   metadata:
     creationTimestamp: null
-    name: tomcat
+    name: ${NAME}${SUFFIX}
   roleRef:
     apiGroup: rbac.authorization.k8s.io
     kind: Role
-    name: tomcat
+    name: ${NAME}${SUFFIX}
   subjects:
   - kind: ServiceAccount
-    name: tomcat
+    name: ${NAME}${SUFFIX}
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
@@ -39,8 +39,8 @@ objects:
   spec:
     replicas: 1
     selector:
-      app: ha-tomcat9
-      deploymentconfig: ha-tomcat9
+      app: ${NAME}${SUFFIX}
+      deploymentconfig: ${NAME}${SUFFIX}
     strategy:
       resources: {}
     template:
@@ -49,12 +49,12 @@ objects:
           openshift.io/generated-by: OpenShiftNewApp
         creationTimestamp: null
         labels:
-          app: ha-tomcat9
-          deploymentconfig: ha-tomcat9
+          app: ${NAME}
+          deploymentconfig: ${NAME}${SUFFIX}
       spec:
-        serviceAccountName: 'tomcat'
+        serviceAccountName: "${NAME}${SUFFIX}"
         containers:
-        - name: tomcat
+        - name: ${NAME}${SUFFIX}
           image: ' '
           env:
             - name: OPENSHIFT_KUBE_PING_NAMESPACE
@@ -62,7 +62,7 @@ objects:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: OPENSHIFT_KUBE_PING_LABELS
-              value: "deploymentconfig=ha-tomcat9"
+              value: "deploymentconfig=${NAME}${SUUFIX}"
             - name: CATALINA_OPTS
               value: "-Djava.security.egd=file:/dev/./urandom"
           ports:
@@ -89,10 +89,10 @@ objects:
     - imageChangeParams:
         automatic: true
         containerNames:
-        - tomcat
+        - ${NAME}${SUFFIX}
         from:
           kind: ImageStreamTag
-          name: ha-tomcat9:latest
+          name: ${NAME}${SUFFIX}:${TOMCAT_IMAGE_TAG}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -108,8 +108,8 @@ objects:
       openshift.io/generated-by: OpenShiftNewApp
     creationTimestamp: null
     labels:
-      app: ha-tomcat9
-    name: ha-tomcat9
+      app: ${NAME}
+    name: ${NAME}${SUFFIX}
   spec:
     ports:
     - name: 8080-tcp
@@ -125,7 +125,7 @@ objects:
       protocol: TCP
       targetPort: 8778
     selector:
-      deploymentconfig: ha-tomcat9
+      deploymentconfig: ${NAME}${SUFFIX}
   status:
     loadBalancer: {}
 - apiVersion: route.openshift.io/v1
@@ -135,14 +135,14 @@ objects:
       haproxy.router.openshift.io/balance: roundrobin
       haproxy.router.openshift.io/disable_cookies: 'true'
     labels:
-      app: ha-tomcat9
-    name: ha-tomcat9
+      app: ${NAME}
+    name: ${NAME}${SUFFIX}
   spec:
     port:
       targetPort: 8080-tcp
     to:
       kind: Service
-      name: ha-tomcat9
+      name: ${NAME}
       weight: 100
     wildcardPolicy: None
   status:
