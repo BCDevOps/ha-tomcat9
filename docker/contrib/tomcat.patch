@@ -1,6 +1,6 @@
 diff --new-file -ru ../original/bin/setenv.sh ./bin/setenv.sh
 --- ../original/bin/setenv.sh	1969-12-31 16:00:00.000000000 -0800
-+++ ./bin/setenv.sh	2019-11-22 10:22:24.000000000 -0800
++++ ./bin/setenv.sh	2019-11-22 11:43:40.000000000 -0800
 @@ -0,0 +1,5 @@
 +CLASSPATH="$CATALINA_HOME/log4j/lib/*:$CATALINA_HOME/log4j/conf"
 +# Reserve 10MB from the available memory
@@ -9,7 +9,7 @@ diff --new-file -ru ../original/bin/setenv.sh ./bin/setenv.sh
 +CATALINA_OPTS="-javaagent:$CATALINA_HOME/bin/jolokia-jvm-1.6.2-agent.jar=port=7070,host=localhost,discoveryEnabled=false $CATALINA_OPTS"
 diff --new-file -ru ../original/bin/unpack-webapps.sh ./bin/unpack-webapps.sh
 --- ../original/bin/unpack-webapps.sh	1969-12-31 16:00:00.000000000 -0800
-+++ ./bin/unpack-webapps.sh	2019-11-22 10:22:24.000000000 -0800
++++ ./bin/unpack-webapps.sh	2019-11-22 11:43:40.000000000 -0800
 @@ -0,0 +1,9 @@
 +#!/usr/bin/env bash
 +set -e
@@ -20,9 +20,76 @@ diff --new-file -ru ../original/bin/unpack-webapps.sh ./bin/unpack-webapps.sh
 +find ./webapps/ -maxdepth 1 -name '*.war' | xargs basename -s .war | xargs -t -I {} mkdir 'webapps/{}'
 +find ./webapps/ -maxdepth 1 -name '*.war' | xargs basename -s .war | xargs -t -I {} unzip -n -qq '/usr/local/tomcat/webapps/{}.war' -d 'webapps/{}'
 +find ./webapps/ -maxdepth 1 -name '*.war' | xargs -t -I {} rm '{}'
+diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
+--- ../original/conf/server.xml	2019-11-22 11:42:32.000000000 -0800
++++ ./conf/server.xml	2019-11-22 11:44:25.000000000 -0800
+@@ -113,7 +113,7 @@
+     -->
+ 
+     <!-- Define an AJP 1.3 Connector on port 8009 -->
+-    <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
++    <!--<Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />-->
+ 
+ 
+     <!-- An Engine represents the entry point (within Catalina) that processes
+@@ -130,9 +130,23 @@
+       <!--For clustering, please take a look at documentation at:
+           /docs/cluster-howto.html  (simple how to)
+           /docs/config/cluster.html (reference documentation) -->
+-      <!--
+-      <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"/>
+-      -->
++      <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster" channelSendOptions="6">
++        <Manager className="org.apache.catalina.ha.session.BackupManager"
++                   expireSessionsOnShutdown="false"
++                   notifyListenersOnReplication="true"/>
++          <Channel className="org.apache.catalina.tribes.group.GroupChannel">
++              <Membership className="org.apache.catalina.tribes.membership.cloud.CloudMembershipService"/>
++             <Interceptor className="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor"/>
++          </Channel>
++          <Valve className="org.apache.catalina.ha.tcp.ReplicationValve"
++                 filter=".*\.gif;.*\.js;.*\.jpg;.*\.htm;.*\.html;.*\.css;.*\.txt"/>
++          <Valve className="org.apache.catalina.valves.RemoteIpValve"
++               internalProxies=".*"
++               remoteIpHeader="x-forwarded-for"
++               proxiesHeader="x-forwarded-by"
++               protocolHeader="x-forwarded-proto" />
++        <ClusterListener className="org.apache.catalina.ha.session.ClusterSessionListener"/>
++      </Cluster>
+ 
+       <!-- Use the LockOutRealm to prevent attempts to guess user passwords
+            via a brute-force attack -->
+@@ -146,13 +160,14 @@
+       </Realm>
+ 
+       <Host name="localhost"  appBase="webapps"
+-            unpackWARs="true" autoDeploy="true">
++            unpackWARs="true" autoDeploy="false" deployOnStartup="true">
+ 
+         <!-- SingleSignOn valve, share authentication between web applications
+              Documentation at: /docs/config/valve.html -->
+         <!--
+         <Valve className="org.apache.catalina.authenticator.SingleSignOn" />
+         -->
++ 
+ 
+         <!-- Access log processes all example.
+              Documentation at: /docs/config/valve.html
+diff --new-file -ru ../original/conf/web.xml ./conf/web.xml
+--- ../original/conf/web.xml	2019-11-22 11:42:32.000000000 -0800
++++ ./conf/web.xml	2019-11-22 11:43:40.000000000 -0800
+@@ -631,7 +631,7 @@
+   <!-- created sessions by modifying the value below.                       -->
+ 
+     <session-config>
+-        <session-timeout>30</session-timeout>
++        <session-timeout>5</session-timeout>
+     </session-config>
+ 
+ 
 diff --new-file -ru ../original/log4j/conf/log4j2-tomcat.xml ./log4j/conf/log4j2-tomcat.xml
 --- ../original/log4j/conf/log4j2-tomcat.xml	1969-12-31 16:00:00.000000000 -0800
-+++ ./log4j/conf/log4j2-tomcat.xml	2019-11-22 11:05:12.000000000 -0800
++++ ./log4j/conf/log4j2-tomcat.xml	2019-11-22 11:43:40.000000000 -0800
 @@ -0,0 +1,26 @@
 +<Configuration status="error"> 
 +    <Properties>
