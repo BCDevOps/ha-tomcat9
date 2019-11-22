@@ -28,8 +28,8 @@ objects:
       openshift.io/generated-by: OpenShiftNewBuild
     creationTimestamp: null
     labels:
-      build: ha-tomcat9
-    name: ha-tomcat9
+      build: ${NAME}
+    name: ${NAME}
   spec:
     lookupPolicy:
       local: false
@@ -42,22 +42,22 @@ objects:
       openshift.io/generated-by: OpenShiftNewBuild
     creationTimestamp: null
     labels:
-      build: ha-tomcat9
-    name: ha-tomcat9
+      build: ${NAME}
+    name: ${NAME}${SUFFIX}
   spec:
     nodeSelector: null
     runPolicy: SerialLatestOnly
     output:
       to:
         kind: ImageStreamTag
-        name: ha-tomcat9:latest
+        name: ${NAME}:${TOMCAT_IMAGE_TAG}
     postCommit: {}
     resources: {}
     source:
       contextDir: docker
       git:
-        ref: master
-        uri: https://github.com/cvarjao/ha-jboss-tomcat.git
+        ref: ${SOURCE_GIT_REF}
+        uri: ${SOURCE_GIT_URL}
       type: Git
     strategy:
       dockerStrategy:
@@ -72,3 +72,20 @@ objects:
       type: ImageChange
   status:
     lastVersion: 0
+parameters:
+- description: Name used for all created objects
+  displayName: Name
+  name: NAME
+  required: true
+  value: ha-tomcat9
+- description: A suffix appended to all objects
+  name: SUFFIX
+  value: -build
+- name: TOMCAT_IMAGE_TAG
+  value: "9.0.27"
+- name: SOURCE_GIT_URL
+  required: true
+  value: https://github.com/BCDevOps/ha-tomcat9.git
+- name: SOURCE_GIT_REF
+  required: false
+  value: master
