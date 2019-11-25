@@ -1,10 +1,9 @@
 diff --new-file -ru ../original/bin/setenv.sh ./bin/setenv.sh
 --- ../original/bin/setenv.sh	1969-12-31 16:00:00.000000000 -0800
-+++ ./bin/setenv.sh	2019-11-22 11:43:40.000000000 -0800
-@@ -0,0 +1,5 @@
++++ ./bin/setenv.sh	2019-11-25 13:08:24.000000000 -0800
+@@ -0,0 +1,4 @@
 +CLASSPATH="$CATALINA_HOME/log4j/lib/*:$CATALINA_HOME/log4j/conf"
 +# Reserve 10MB from the available memory
-+CATALINA_OPTS="-Xmx40M $CATALINA_OPTS"
 +CATALINA_OPTS="-XshowSettings:vm  -XX:MaxRAM=$(( $(cat /sys/fs/cgroup/memory/memory.limit_in_bytes) - ( 1024 * 10) )) -XX:MaxRAMPercentage=100.0 $CATALINA_OPTS"
 +CATALINA_OPTS="-javaagent:$CATALINA_HOME/bin/jolokia-jvm-1.6.2-agent.jar=port=7070,host=localhost,discoveryEnabled=false $CATALINA_OPTS"
 diff --new-file -ru ../original/bin/unpack-webapps.sh ./bin/unpack-webapps.sh
@@ -87,33 +86,3 @@ diff --new-file -ru ../original/conf/web.xml ./conf/web.xml
      </session-config>
  
  
-diff --new-file -ru ../original/log4j/conf/log4j2-tomcat.xml ./log4j/conf/log4j2-tomcat.xml
---- ../original/log4j/conf/log4j2-tomcat.xml	1969-12-31 16:00:00.000000000 -0800
-+++ ./log4j/conf/log4j2-tomcat.xml	2019-11-22 11:43:40.000000000 -0800
-@@ -0,0 +1,26 @@
-+<Configuration status="error"> 
-+    <Properties>
-+        <Property name="layout.catalina"  value="%d [catalina ] [%-5p] - %m%n"/>
-+        <Property name="layout.localhost" value="%d [localhost] [%-5p] - %m%n"/>
-+    </Properties> 
-+    <Appenders> 
-+		<Console name="CATALINA">
-+	      <PatternLayout>
-+	        <Pattern>${layout.catalina}</Pattern>
-+	      </PatternLayout>
-+		</Console>
-+		<Console name="LOCALHOST">
-+	      <PatternLayout>
-+	        <Pattern>${layout.localhost}</Pattern>
-+	      </PatternLayout>
-+		</Console>
-+    </Appenders> 
-+    <Loggers> 
-+        <Root level="INFO"> 
-+            <AppenderRef ref="CATALINA"/> 
-+        </Root>
-+        <Logger name="org.apache.catalina.core.ContainerBase.[Catalina].[localhost]" level="DEBUG" additivity="false"> 
-+            <AppenderRef ref="LOCALHOST"/> 
-+        </Logger> 
-+    </Loggers> 
-+</Configuration>
