@@ -50,7 +50,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: ${NAME}:${TOMCAT_IMAGE_TAG}
+        name: ${NAME}${SUFFIX}:${TOMCAT_IMAGE_TAG}
     postCommit: {}
     resources: {}
     source:

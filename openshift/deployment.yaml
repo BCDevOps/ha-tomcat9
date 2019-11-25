@@ -54,7 +54,7 @@ objects:
       spec:
         serviceAccountName: "${NAME}${SUFFIX}"
         containers:
-        - name: ${NAME}${SUFFIX}
+        - name: tomcat
           image: ' '
           env:
             - name: OPENSHIFT_KUBE_PING_NAMESPACE
@@ -89,7 +89,7 @@ objects:
     - imageChangeParams:
         automatic: true
         containerNames:
-        - ${NAME}${SUFFIX}
+        - tomcat
         from:
           kind: ImageStreamTag
           name: ${NAME}${SUFFIX}:${TOMCAT_IMAGE_TAG}
