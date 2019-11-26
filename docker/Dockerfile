@@ -12,9 +12,9 @@ RUN set -xe && \
     ( cd /usr/local/tomcat && sha1sum --check /usr/local/tomcat/tomcat.sha1 --status) && \
     patch --batch --forward --unified  --strip=1 --directory=/usr/local/tomcat --input=/usr/local/tomcat/tomcat.patch && \
     mkdir -p /usr/local/tomcat/log4j/lib /usr/local/tomcat/log4j/conf && \
-    curl -sSL https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/$LOG4J_VERSION/log4j-api-$LOG4J_VERSION.jar -o /usr/local/tomcat/log4j/lib/log4j-api-$LOG4J_VERSION.jar && \
-    curl -sSL https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/$LOG4J_VERSION/log4j-core-$LOG4J_VERSION.jar -o /usr/local/tomcat/log4j/lib/log4j-core-$LOG4J_VERSION.jar && \
-    curl -sSL https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-appserver/$LOG4J_VERSION/log4j-appserver-$LOG4J_VERSION.jar -o /usr/local/tomcat/log4j/lib/log4j-appserver-$LOG4J_VERSION.jar && \
+    curl -sSL https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/$LOG4J_VERSION/log4j-api-$LOG4J_VERSION.jar -o /usr/local/tomcat/log4j2/lib/log4j-api-$LOG4J_VERSION.jar && \
+    curl -sSL https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/$LOG4J_VERSION/log4j-core-$LOG4J_VERSION.jar -o /usr/local/tomcat/log4j2/lib/log4j-core-$LOG4J_VERSION.jar && \
+    curl -sSL https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-appserver/$LOG4J_VERSION/log4j-appserver-$LOG4J_VERSION.jar -o /usr/local/tomcat/log4j2/lib/log4j-appserver-$LOG4J_VERSION.jar && \
     rm /usr/local/tomcat/conf/logging.properties && \
     curl -sSL https://repo1.maven.org/maven2/org/jolokia/jolokia-jvm/1.6.2/jolokia-jvm-1.6.2-agent.jar -o /usr/local/tomcat/bin/jolokia-jvm-1.6.2-agent.jar && \
     apt-get remove -qq -y --purge patch && apt-get clean && set +x && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
