@@ -21,7 +21,7 @@ diff --new-file -ru ../original/bin/unpack-webapps.sh ./bin/unpack-webapps.sh
 +find ./webapps/ -maxdepth 1 -name '*.war' | xargs -t -I {} rm '{}'
 diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
 --- ../original/conf/server.xml	2019-11-22 11:42:32.000000000 -0800
-+++ ./conf/server.xml	2019-12-23 09:30:24.000000000 -0800
++++ ./conf/server.xml	2019-12-23 12:38:28.000000000 -0800
 @@ -113,7 +113,7 @@
      -->
  
@@ -44,8 +44,8 @@ diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
 +                   notifyListenersOnReplication="true"/>
 +          <Channel className="org.apache.catalina.tribes.group.GroupChannel">
 +              <Membership className="org.apache.catalina.tribes.membership.cloud.CloudMembershipService"
-+                         expirationTime="10000ms"/>
-+                         
++                         expirationTime="10000"/>
++
 +             <Interceptor className="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor"/>
 +          </Channel>
 +          <Valve className="org.apache.catalina.ha.tcp.ReplicationValve"
