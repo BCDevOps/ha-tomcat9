@@ -21,7 +21,7 @@ diff --new-file -ru ../original/bin/unpack-webapps.sh ./bin/unpack-webapps.sh
 +find ./webapps/ -maxdepth 1 -name '*.war' | xargs -t -I {} rm '{}'
 diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
 --- ../original/conf/server.xml	2019-11-22 11:42:32.000000000 -0800
-+++ ./conf/server.xml	2019-11-22 11:44:25.000000000 -0800
++++ ./conf/server.xml	2019-12-23 13:22:41.000000000 -0800
 @@ -113,7 +113,7 @@
      -->
  
@@ -31,7 +31,7 @@ diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
  
  
      <!-- An Engine represents the entry point (within Catalina) that processes
-@@ -130,9 +130,23 @@
+@@ -130,9 +130,25 @@
        <!--For clustering, please take a look at documentation at:
            /docs/cluster-howto.html  (simple how to)
            /docs/config/cluster.html (reference documentation) -->
@@ -43,7 +43,9 @@ diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
 +                   expireSessionsOnShutdown="false"
 +                   notifyListenersOnReplication="true"/>
 +          <Channel className="org.apache.catalina.tribes.group.GroupChannel">
-+              <Membership className="org.apache.catalina.tribes.membership.cloud.CloudMembershipService"/>
++              <Membership className="org.apache.catalina.tribes.membership.cloud.CloudMembershipService"
++                         expirationTime="10000"/>
++
 +             <Interceptor className="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor"/>
 +          </Channel>
 +          <Valve className="org.apache.catalina.ha.tcp.ReplicationValve"
@@ -58,7 +60,7 @@ diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
  
        <!-- Use the LockOutRealm to prevent attempts to guess user passwords
             via a brute-force attack -->
-@@ -146,13 +160,14 @@
+@@ -146,13 +162,14 @@
        </Realm>
  
        <Host name="localhost"  appBase="webapps"
@@ -88,7 +90,7 @@ diff --new-file -ru ../original/conf/web.xml ./conf/web.xml
  
 diff --new-file -ru ../original/log4j2/conf/log4j2-tomcat.xml ./log4j2/conf/log4j2-tomcat.xml
 --- ../original/log4j2/conf/log4j2-tomcat.xml	1969-12-31 16:00:00.000000000 -0800
-+++ ./log4j2/conf/log4j2-tomcat.xml	2019-11-26 11:18:23.000000000 -0800
++++ ./log4j2/conf/log4j2-tomcat.xml	2019-12-23 13:29:02.000000000 -0800
 @@ -0,0 +1,26 @@
 +<Configuration status="error"> 
 +    <Properties>
@@ -111,7 +113,7 @@ diff --new-file -ru ../original/log4j2/conf/log4j2-tomcat.xml ./log4j2/conf/log4
 +        <Root level="INFO"> 
 +            <AppenderRef ref="CATALINA"/> 
 +        </Root>
-+        <Logger name="org.apache.catalina.core.ContainerBase.[Catalina].[localhost]" level="DEBUG" additivity="false"> 
++        <Logger name="org.apache.catalina.core.ContainerBase.[Catalina].[localhost]" level="WARN" additivity="false"> 
 +            <AppenderRef ref="LOCALHOST"/> 
 +        </Logger> 
 +    </Loggers> 
