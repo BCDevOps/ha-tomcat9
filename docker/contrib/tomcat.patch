@@ -21,7 +21,7 @@ diff --new-file -ru ../original/bin/unpack-webapps.sh ./bin/unpack-webapps.sh
 +find ./webapps/ -maxdepth 1 -name '*.war' | xargs -t -I {} rm '{}'
 diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
 --- ../original/conf/server.xml	2019-11-22 11:42:32.000000000 -0800
-+++ ./conf/server.xml	2019-12-23 12:38:28.000000000 -0800
++++ ./conf/server.xml	2019-12-23 13:08:52.000000000 -0800
 @@ -113,7 +113,7 @@
      -->
  
@@ -31,7 +31,7 @@ diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
  
  
      <!-- An Engine represents the entry point (within Catalina) that processes
-@@ -130,9 +130,25 @@
+@@ -130,9 +130,26 @@
        <!--For clustering, please take a look at documentation at:
            /docs/cluster-howto.html  (simple how to)
            /docs/config/cluster.html (reference documentation) -->
@@ -44,7 +44,8 @@ diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
 +                   notifyListenersOnReplication="true"/>
 +          <Channel className="org.apache.catalina.tribes.group.GroupChannel">
 +              <Membership className="org.apache.catalina.tribes.membership.cloud.CloudMembershipService"
-+                         expirationTime="10000"/>
++                         expirationTime="10000"
++                         dropTime="6000"/>
 +
 +             <Interceptor className="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor"/>
 +          </Channel>
@@ -60,7 +61,7 @@ diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
  
        <!-- Use the LockOutRealm to prevent attempts to guess user passwords
             via a brute-force attack -->
-@@ -146,13 +162,14 @@
+@@ -146,13 +163,14 @@
        </Realm>
  
        <Host name="localhost"  appBase="webapps"
