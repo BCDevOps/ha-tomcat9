@@ -62,6 +62,17 @@ diff --new-file -ru ../original/bin/catalina.sh ./bin/catalina.sh
 +
 +
 +
+diff --new-file -ru ../original/bin/set-proxy-host.sh ./bin/set-proxy-host.sh
+--- ../original/bin/set-proxy-host.sh	1969-12-31 16:00:00.000000000 -0800
++++ ./bin/set-proxy-host.sh	2020-03-09 14:09:56.000000000 -0700
+@@ -0,0 +1,6 @@
++  if [ ! -z PROXY_HOST ] 
++     then 
++        sed -i 's/<!--ProxyHostForProd//' $CATALINA_HOME/conf/server.xml
++        sed -i 's/ProxyHostForProd-->//' $CATALINA_HOME/conf/server.xml
++        echo "Add ProxyHost configuration if PROXY_HOST"
++  fi
+\ No newline at end of file
 diff --new-file -ru ../original/bin/setenv.sh ./bin/setenv.sh
 --- ../original/bin/setenv.sh	1969-12-31 16:00:00.000000000 -0800
 +++ ./bin/setenv.sh	2020-03-09 10:01:10.000000000 -0700
