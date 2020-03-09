@@ -1,6 +1,6 @@
 diff --new-file -ru ../original/bin/catalina.sh ./bin/catalina.sh
 --- ../original/bin/catalina.sh	2019-11-22 11:42:32.000000000 -0800
-+++ ./bin/catalina.sh	2020-02-18 08:42:44.000000000 -0800
++++ ./bin/catalina.sh	2020-03-09 10:14:03.000000000 -0700
 @@ -354,7 +354,7 @@
          echo "Using Security Manager"
        fi
@@ -55,17 +55,29 @@ diff --new-file -ru ../original/bin/catalina.sh ./bin/catalina.sh
        -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
        -classpath "\"$CLASSPATH\"" \
        -Dcatalina.base="\"$CATALINA_BASE\"" \
+@@ -649,3 +649,12 @@
+   exit 1
+ 
+ fi
++
++# Set Proxy Host Settings Only for Production 
++
++if [ ! -z PROXY_HOST ] 
++then 
++  sed 's/<!--ProxyHostForProd//' $CATALINA_HOME/conf/server.xml
++  sed 's/ProxyHostForProd-->//' $CATALINA_HOME/conf/server.xml
++fi
++ 
+\ No newline at end of file
 diff --new-file -ru ../original/bin/setenv.sh ./bin/setenv.sh
 --- ../original/bin/setenv.sh	1969-12-31 16:00:00.000000000 -0800
-+++ ./bin/setenv.sh	2020-02-18 08:44:06.000000000 -0800
-@@ -0,0 +1,6 @@
++++ ./bin/setenv.sh	2020-03-09 10:01:10.000000000 -0700
+@@ -0,0 +1,5 @@
 +CLASSPATH="$CATALINA_HOME/log4j2/lib/*:$CATALINA_HOME/log4j2/conf"
 +# Reserve 10MB from the available memory
 +CATALINA_OPTS="-XshowSettings:vm  -XX:MaxRAM=$(( $(cat /sys/fs/cgroup/memory/memory.limit_in_bytes) - ( 1024 * 10) )) -XX:MaxRAMPercentage=100.0 $CATALINA_OPTS"
 +CATALINA_OPTS="-javaagent:$CATALINA_HOME/bin/jolokia-jvm-1.6.2-agent.jar=port=7070,host=localhost,discoveryEnabled=false $CATALINA_OPTS"
 +DEFAULT_CATALINA_OPTS='-Dorg.apache.tomcat.util.digester.PROPERTY_SOURCE=org.apache.tomcat.util.digester.Digester\$EnvironmentPropertySource -Djava.security.egd=file:/dev/./urandom'
-+PROXY_HOST=a100.gov.bc.ca
-\ No newline at end of file
 diff --new-file -ru ../original/bin/unpack-webapps.sh ./bin/unpack-webapps.sh
 --- ../original/bin/unpack-webapps.sh	1969-12-31 16:00:00.000000000 -0800
 +++ ./bin/unpack-webapps.sh	2019-11-22 11:43:40.000000000 -0800
@@ -81,16 +93,15 @@ diff --new-file -ru ../original/bin/unpack-webapps.sh ./bin/unpack-webapps.sh
 +find ./webapps/ -maxdepth 1 -name '*.war' | xargs -t -I {} rm '{}'
 diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
 --- ../original/conf/server.xml	2019-11-22 11:42:32.000000000 -0800
-+++ ./conf/server.xml	2020-02-18 08:45:25.000000000 -0800
-@@ -66,14 +66,14 @@
++++ ./conf/server.xml	2020-03-09 10:10:40.000000000 -0700
+@@ -66,14 +66,12 @@
           APR (HTTP/AJP) Connector: /docs/apr.html
           Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
      -->
 -    <Connector port="8080" protocol="HTTP/1.1"
 -               connectionTimeout="20000"
-+    <Connector port="8080" proxyPort="80" proxyName="${PROXY_HOST}" protocol="HTTP/1.1" 
-+               connectionTimeout="40000" 
-                redirectPort="8443" />
+-               redirectPort="8443" />
++    <!--ProxyHostForProd <Connector port="8080" proxyPort="80" proxyName="${PROXY_HOST}" protocol="HTTP/1.1" connectionTimeout="40000" redirectPort="8443" /> ProxyHostForProd-->
      <!-- A "Connector" using the shared thread pool-->
      <!--
      <Connector executor="tomcatThreadPool"
@@ -100,7 +111,7 @@ diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
                 redirectPort="8443" />
      -->
      <!-- Define an SSL/TLS HTTP/1.1 Connector on port 8443
-@@ -113,7 +113,7 @@
+@@ -113,7 +111,7 @@
      -->
  
      <!-- Define an AJP 1.3 Connector on port 8009 -->
@@ -109,7 +120,7 @@ diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
  
  
      <!-- An Engine represents the entry point (within Catalina) that processes
-@@ -130,9 +130,25 @@
+@@ -130,9 +128,25 @@
        <!--For clustering, please take a look at documentation at:
            /docs/cluster-howto.html  (simple how to)
            /docs/config/cluster.html (reference documentation) -->
@@ -138,7 +149,7 @@ diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
  
        <!-- Use the LockOutRealm to prevent attempts to guess user passwords
             via a brute-force attack -->
-@@ -146,13 +162,14 @@
+@@ -146,13 +160,14 @@
        </Realm>
  
        <Host name="localhost"  appBase="webapps"
