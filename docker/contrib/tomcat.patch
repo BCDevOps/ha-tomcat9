@@ -1,76 +1,117 @@
 diff --new-file -ru ../original/bin/catalina.sh ./bin/catalina.sh
 --- ../original/bin/catalina.sh	2019-11-22 11:42:32.000000000 -0800
-+++ ./bin/catalina.sh	2020-03-09 11:52:39.000000000 -0700
-@@ -274,7 +274,13 @@
-     UMASK="0027"
- fi
- umask $UMASK
--
-+# Set Proxy Host Settings Only for Production 
-+if [ ! -z PROXY_HOST ] 
-+then 
-+  sed -i 's/<!--ProxyHostForProd//' $CATALINA_HOME/conf/server.xml
-+  sed -i 's/ProxyHostForProd-->//' $CATALINA_HOME/conf/server.xml
-+  echo "Add ProxyHost configuration if PROXY_HOST exists"
-+fi
- # Java 9 no longer supports the java.endorsed.dirs
- # system property. Only try to use it if
- # JAVA_ENDORSED_DIRS was explicitly set
-@@ -354,7 +360,7 @@
++++ ./bin/catalina.sh	2020-03-09 13:49:25.000000000 -0700
+@@ -354,7 +354,14 @@
          echo "Using Security Manager"
        fi
        shift
 -      exec "$_RUNJDB" "$LOGGING_CONFIG" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
++      # Set Proxy Host Settings Only for Production 
++      if [ ! -z PROXY_HOST ] 
++      then 
++        sed -i 's/<!--ProxyHostForProd//' $CATALINA_HOME/conf/server.xml
++        sed -i 's/ProxyHostForProd-->//' $CATALINA_HOME/conf/server.xml
++        echo "Add ProxyHost configuration if PROXY_HOST"
++      fi
 +      exec "$_RUNJDB" "$LOGGING_CONFIG" $LOGGING_MANAGER $JAVA_OPTS $DEFAULT_CATALINA_OPTS $CATALINA_OPTS \
          -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
          -classpath "$CLASSPATH" \
          -sourcepath "$CATALINA_HOME"/../../java \
-@@ -365,7 +371,7 @@
+@@ -365,7 +372,14 @@
          -Djava.io.tmpdir="$CATALINA_TMPDIR" \
          org.apache.catalina.startup.Bootstrap "$@" start
      else
 -      exec "$_RUNJDB" "$LOGGING_CONFIG" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
++    # Set Proxy Host Settings Only for Production 
++      if [ ! -z PROXY_HOST ] 
++      then 
++        sed -i 's/<!--ProxyHostForProd//' $CATALINA_HOME/conf/server.xml
++        sed -i 's/ProxyHostForProd-->//' $CATALINA_HOME/conf/server.xml
++        echo "Add ProxyHost configuration if PROXY_HOST"
++      fi
 +      exec "$_RUNJDB" "$LOGGING_CONFIG" $LOGGING_MANAGER $JAVA_OPTS $DEFAULT_CATALINA_OPTS $CATALINA_OPTS \
          -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
          -classpath "$CLASSPATH" \
          -sourcepath "$CATALINA_HOME"/../../java \
-@@ -384,7 +390,7 @@
+@@ -384,7 +398,14 @@
        echo "Using Security Manager"
      fi
      shift
 -    eval exec "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
++    # Set Proxy Host Settings Only for Production 
++      if [ ! -z PROXY_HOST ] 
++      then 
++        sed -i 's/<!--ProxyHostForProd//' $CATALINA_HOME/conf/server.xml
++        sed -i 's/ProxyHostForProd-->//' $CATALINA_HOME/conf/server.xml
++        echo "Add ProxyHost configuration if PROXY_HOST"
++      fi
 +    eval exec "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $DEFAULT_CATALINA_OPTS $CATALINA_OPTS \
        -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
        -classpath "\"$CLASSPATH\"" \
        -Djava.security.manager \
-@@ -394,7 +400,7 @@
+@@ -394,7 +415,14 @@
        -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
        org.apache.catalina.startup.Bootstrap "$@" start
    else
 -    eval exec "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
++  # Set Proxy Host Settings Only for Production 
++      if [ ! -z PROXY_HOST ] 
++      then 
++        sed -i 's/<!--ProxyHostForProd//' $CATALINA_HOME/conf/server.xml
++        sed -i 's/ProxyHostForProd-->//' $CATALINA_HOME/conf/server.xml
++        echo "Add ProxyHost configuration if PROXY_HOST"
++      fi
 +    eval exec "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $DEFAULT_CATALINA_OPTS $CATALINA_OPTS \
        -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
        -classpath "\"$CLASSPATH\"" \
        -Dcatalina.base="\"$CATALINA_BASE\"" \
-@@ -452,7 +458,7 @@
+@@ -429,6 +457,13 @@
+               fi
+             fi
+           fi
++          # Set Proxy Host Settings Only for Production 
++      if [ ! -z PROXY_HOST ] 
++      then 
++        sed -i 's/<!--ProxyHostForProd//' $CATALINA_HOME/conf/server.xml
++        sed -i 's/ProxyHostForProd-->//' $CATALINA_HOME/conf/server.xml
++        echo "Add ProxyHost configuration if PROXY_HOST"
++      fi
+         else
+           echo "Unable to read PID file. Start aborted."
+           exit 1
+@@ -452,7 +487,14 @@
        echo "Using Security Manager"
      fi
      shift
 -    eval $_NOHUP "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
++    # Set Proxy Host Settings Only for Production 
++      if [ ! -z PROXY_HOST ] 
++      then 
++        sed -i 's/<!--ProxyHostForProd//' $CATALINA_HOME/conf/server.xml
++        sed -i 's/ProxyHostForProd-->//' $CATALINA_HOME/conf/server.xml
++        echo "Add ProxyHost configuration if PROXY_HOST"
++      fi
 +    eval $_NOHUP "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $DEFAULT_CATALINA_OPTS $CATALINA_OPTS \
        -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
        -classpath "\"$CLASSPATH\"" \
        -Djava.security.manager \
-@@ -464,7 +470,7 @@
+@@ -464,7 +506,14 @@
        >> "$CATALINA_OUT" 2>&1 "&"
  
    else
 -    eval $_NOHUP "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
++  # Set Proxy Host Settings Only for Production 
++      if [ ! -z PROXY_HOST ] 
++      then 
++        sed -i 's/<!--ProxyHostForProd//' $CATALINA_HOME/conf/server.xml
++        sed -i 's/ProxyHostForProd-->//' $CATALINA_HOME/conf/server.xml
++        echo "Add ProxyHost configuration if PROXY_HOST"
++      fi
 +    eval $_NOHUP "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $DEFAULT_CATALINA_OPTS $CATALINA_OPTS \
        -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
        -classpath "\"$CLASSPATH\"" \
        -Dcatalina.base="\"$CATALINA_BASE\"" \
-@@ -649,3 +655,6 @@
+@@ -649,3 +698,6 @@
    exit 1
  
  fi
@@ -108,7 +149,7 @@ diff --new-file -ru ../original/bin/unpack-webapps.sh ./bin/unpack-webapps.sh
 \ No newline at end of file
 diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
 --- ../original/conf/server.xml	2019-11-22 11:42:32.000000000 -0800
-+++ ./conf/server.xml	2020-03-09 10:10:40.000000000 -0700
++++ ./conf/server.xml	2020-03-09 13:48:14.000000000 -0700
 @@ -66,14 +66,12 @@
           APR (HTTP/AJP) Connector: /docs/apr.html
           Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
@@ -148,7 +189,7 @@ diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
 +                   notifyListenersOnReplication="true"/>
 +          <Channel className="org.apache.catalina.tribes.group.GroupChannel">
 +              <Membership className="org.apache.catalina.tribes.membership.cloud.CloudMembershipService"
-+                         expirationTime="10000"/>
++                         expirationTime="15000"/>
 +
 +             <Interceptor className="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor"/>
 +          </Channel>
