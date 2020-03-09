@@ -71,23 +71,6 @@ diff --new-file -ru ../original/bin/setenv.sh ./bin/setenv.sh
 +CATALINA_OPTS="-XshowSettings:vm  -XX:MaxRAM=$(( $(cat /sys/fs/cgroup/memory/memory.limit_in_bytes) - ( 1024 * 10) )) -XX:MaxRAMPercentage=100.0 $CATALINA_OPTS"
 +CATALINA_OPTS="-javaagent:$CATALINA_HOME/bin/jolokia-jvm-1.6.2-agent.jar=port=7070,host=localhost,discoveryEnabled=false $CATALINA_OPTS"
 +DEFAULT_CATALINA_OPTS='-Dorg.apache.tomcat.util.digester.PROPERTY_SOURCE=org.apache.tomcat.util.digester.Digester\$EnvironmentPropertySource -Djava.security.egd=file:/dev/./urandom'
-diff --new-file -ru ../original/bin/startup.sh ./bin/startup.sh
---- ../original/bin/startup.sh	2020-03-09 14:01:15.000000000 -0700
-+++ ./bin/startup.sh	2020-03-09 13:58:43.000000000 -0700
-@@ -57,4 +57,12 @@
-   fi
- fi
- 
-+# Set Proxy Host Settings Only for Production 
-+if [ ! -z PROXY_HOST ] 
-+then 
-+  sed -i 's/<!--ProxyHostForProd//' $CATALINA_HOME/conf/server.xml
-+  sed -i 's/ProxyHostForProd-->//' $CATALINA_HOME/conf/server.xml
-+  echo "Add ProxyHost configuration if"
-+fi
-+
- exec "$PRGDIR"/"$EXECUTABLE" start "$@"
-\ No newline at end of file
 diff --new-file -ru ../original/bin/unpack-webapps.sh ./bin/unpack-webapps.sh
 --- ../original/bin/unpack-webapps.sh	1969-12-31 16:00:00.000000000 -0800
 +++ ./bin/unpack-webapps.sh	2020-03-09 11:48:58.000000000 -0700
