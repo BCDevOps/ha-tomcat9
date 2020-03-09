@@ -1,7 +1,22 @@
 diff --new-file -ru ../original/bin/catalina.sh ./bin/catalina.sh
 --- ../original/bin/catalina.sh	2019-11-22 11:42:32.000000000 -0800
-+++ ./bin/catalina.sh	2020-03-09 11:49:00.000000000 -0700
-@@ -354,7 +354,7 @@
++++ ./bin/catalina.sh	2020-03-09 11:52:39.000000000 -0700
+@@ -274,7 +274,13 @@
+     UMASK="0027"
+ fi
+ umask $UMASK
+-
++# Set Proxy Host Settings Only for Production 
++if [ ! -z PROXY_HOST ] 
++then 
++  sed -i 's/<!--ProxyHostForProd//' $CATALINA_HOME/conf/server.xml
++  sed -i 's/ProxyHostForProd-->//' $CATALINA_HOME/conf/server.xml
++  echo "Add ProxyHost configuration if PROXY_HOST exists"
++fi
+ # Java 9 no longer supports the java.endorsed.dirs
+ # system property. Only try to use it if
+ # JAVA_ENDORSED_DIRS was explicitly set
+@@ -354,7 +360,7 @@
          echo "Using Security Manager"
        fi
        shift
@@ -10,7 +25,7 @@ diff --new-file -ru ../original/bin/catalina.sh ./bin/catalina.sh
          -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
          -classpath "$CLASSPATH" \
          -sourcepath "$CATALINA_HOME"/../../java \
-@@ -365,7 +365,7 @@
+@@ -365,7 +371,7 @@
          -Djava.io.tmpdir="$CATALINA_TMPDIR" \
          org.apache.catalina.startup.Bootstrap "$@" start
      else
@@ -19,7 +34,7 @@ diff --new-file -ru ../original/bin/catalina.sh ./bin/catalina.sh
          -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
          -classpath "$CLASSPATH" \
          -sourcepath "$CATALINA_HOME"/../../java \
-@@ -384,7 +384,7 @@
+@@ -384,7 +390,7 @@
        echo "Using Security Manager"
      fi
      shift
@@ -28,7 +43,7 @@ diff --new-file -ru ../original/bin/catalina.sh ./bin/catalina.sh
        -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
        -classpath "\"$CLASSPATH\"" \
        -Djava.security.manager \
-@@ -394,7 +394,7 @@
+@@ -394,7 +400,7 @@
        -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
        org.apache.catalina.startup.Bootstrap "$@" start
    else
@@ -37,7 +52,7 @@ diff --new-file -ru ../original/bin/catalina.sh ./bin/catalina.sh
        -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
        -classpath "\"$CLASSPATH\"" \
        -Dcatalina.base="\"$CATALINA_BASE\"" \
-@@ -452,7 +452,7 @@
+@@ -452,7 +458,7 @@
        echo "Using Security Manager"
      fi
      shift
@@ -46,7 +61,7 @@ diff --new-file -ru ../original/bin/catalina.sh ./bin/catalina.sh
        -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
        -classpath "\"$CLASSPATH\"" \
        -Djava.security.manager \
-@@ -464,7 +464,7 @@
+@@ -464,7 +470,7 @@
        >> "$CATALINA_OUT" 2>&1 "&"
  
    else
@@ -55,12 +70,11 @@ diff --new-file -ru ../original/bin/catalina.sh ./bin/catalina.sh
        -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
        -classpath "\"$CLASSPATH\"" \
        -Dcatalina.base="\"$CATALINA_BASE\"" \
-@@ -649,3 +649,7 @@
+@@ -649,3 +655,6 @@
    exit 1
  
  fi
 +
-+# Set Proxy Host Settings Only for Production 
 +
 +
 diff --new-file -ru ../original/bin/setenv.sh ./bin/setenv.sh
