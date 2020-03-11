@@ -92,14 +92,14 @@ diff --new-file -ru ../original/bin/unpack-webapps.sh ./bin/unpack-webapps.sh
 +fi
 \ No newline at end of file
 diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
---- ../original/conf/server.xml	2019-11-22 11:42:32.000000000 -0800
+--- ../original/conf/server.xml	2020-03-11 09:21:37.000000000 -0700
 +++ ./conf/server.xml	2020-03-09 13:48:14.000000000 -0700
 @@ -66,14 +66,12 @@
           APR (HTTP/AJP) Connector: /docs/apr.html
           Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
      -->
 -    <Connector port="8080" protocol="HTTP/1.1"
--               connectionTimeout="20000"
+-               connectionTimeout="40000"
 -               redirectPort="8443" />
 +    <!--ProxyHostForProd <Connector port="8080" proxyPort="80" proxyName="${PROXY_HOST}" protocol="HTTP/1.1" connectionTimeout="40000" redirectPort="8443" /> ProxyHostForProd-->
      <!-- A "Connector" using the shared thread pool-->
