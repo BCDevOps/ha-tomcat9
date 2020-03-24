@@ -91,7 +91,7 @@ diff --new-file -ru ../original/bin/unpack-webapps.sh ./bin/unpack-webapps.sh
 +find ./webapps/ -maxdepth 1 -name '*.war' | xargs -t -I {} rm '{}'
 diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
 --- ../original/conf/server.xml	2020-03-11 09:22:10.000000000 -0700
-+++ ./conf/server.xml	2020-03-11 09:22:40.000000000 -0700
++++ ./conf/server.xml	2020-03-24 13:20:05.000000000 -0700
 @@ -66,14 +66,13 @@
           APR (HTTP/AJP) Connector: /docs/apr.html
           Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
@@ -99,8 +99,8 @@ diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
 -    <Connector port="8080" protocol="HTTP/1.1"
 -               connectionTimeout="20000"
 -               redirectPort="8443" />
-+    <!--ProxyHostForProd <Connector port="8080" proxyPort="80" proxyName="${PROXY_HOST}" protocol="HTTP/1.1" connectionTimeout="40000" redirectPort="8443" /> ProxyHostForProd-->
-+    <Connector port="8080" protocol="HTTP/1.1" connectionTimeout="40000" redirectPort="8443" />
++    <Connector port="8080" proxyPort="80" proxyName="${PROXY_HOST}" protocol="HTTP/1.1" connectionTimeout="40000" redirectPort="8443" /> 
++    <!-- <Connector port="8080" protocol="HTTP/1.1" connectionTimeout="40000" redirectPort="8443" /> -->
      <!-- A "Connector" using the shared thread pool-->
      <!--
      <Connector executor="tomcatThreadPool"
