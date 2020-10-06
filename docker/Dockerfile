@@ -18,3 +18,6 @@ RUN set -xe && \
     rm /usr/local/tomcat/conf/logging.properties && \
     curl -sSL https://repo1.maven.org/maven2/org/jolokia/jolokia-jvm/1.6.2/jolokia-jvm-1.6.2-agent.jar -o /usr/local/tomcat/bin/jolokia-jvm-1.6.2-agent.jar && \
     apt-get remove -qq -y --purge patch && apt-get clean && set +x && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
+
+VOLUME [ "/usr/local/tomcat/ext/webade/lib", "/usr/local/tomcat/ext/webade/classes" ]
+VOLUME [ "/usr/local/tomcat/webapps" ]
