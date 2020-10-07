@@ -43,14 +43,14 @@ objects:
     creationTimestamp: null
     labels:
       build: ${NAME}
-    name: ${NAME}${SUFFIX}
+    name: ${NAME}-${VERSION}${SUFFIX}
   spec:
     nodeSelector: null
     runPolicy: SerialLatestOnly
     output:
       to:
         kind: ImageStreamTag
-        name: ${NAME}:${TOMCAT_VERSION}${IMAGE_TAG_SUFFIX}
+        name: ${NAME}:${VERSION}${SUFFIX}
     postCommit: {}
     resources: {}
     source:
@@ -76,18 +76,20 @@ parameters:
 - description: Name used for all created objects
   displayName: Name
   name: NAME
-  required: true
   value: ha-tomcat9
-- description: A suffix appended to all objects
-  name: SUFFIX
-  value: -build
+  required: true
 - name: TOMCAT_VERSION
   value: "9.0.27"
-- name: IMAGE_TAG_SUFFIX
-  value: "-latest"
-- name: SOURCE_GIT_URL
+- name: SUFFIX
+  description: A suffix appended to all objects
+- name: VERSION
+  description: The major and minor version of this image.
   required: true
+- name: SOURCE_GIT_URL
+  description: Source Git URL
   value: https://github.com/BCDevOps/ha-tomcat9.git
+  required: true
 - name: SOURCE_GIT_REF
-  required: false
+  description: Source Git Branch
   value: master
+  required: true
