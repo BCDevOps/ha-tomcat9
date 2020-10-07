@@ -50,7 +50,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: ${NAME}${SUFFIX}:${TOMCAT_IMAGE_TAG}
+        name: ${NAME}:${OUTPUT_IMAGE_TAG}
     postCommit: {}
     resources: {}
     source:
@@ -83,6 +83,8 @@ parameters:
   value: -build
 - name: TOMCAT_IMAGE_TAG
   value: "9.0.27"
+- name: OUTPUT_IMAGE_TAG
+  value: "9.0.27-build"
 - name: SOURCE_GIT_URL
   required: true
   value: https://github.com/BCDevOps/ha-tomcat9.git
