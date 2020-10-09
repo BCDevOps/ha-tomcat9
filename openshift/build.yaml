@@ -13,10 +13,10 @@ objects:
       - annotations: null
         from:
           kind: DockerImage
-          name: 'tomcat:9.0.27-jdk8-openjdk'
+          name: 'tomcat:${TOMCAT_VERSION}-jdk8-openjdk'
         generation: 1
         importPolicy: {}
-        name: 9.0.27-jdk8-openjdk
+        name: ${TOMCAT_VERSION}-jdk8-openjdk
         referencePolicy:
           type: Local
   status:
@@ -50,7 +50,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: ${NAME}:${OUTPUT_IMAGE_TAG}
+        name: ${NAME}:${TOMCAT_VERSION}${IMAGE_TAG_SUFFIX}
     postCommit: {}
     resources: {}
     source:
@@ -64,7 +64,7 @@ objects:
         imageOptimizationPolicy: SkipLayers
         from:
           kind: ImageStreamTag
-          name: tomcat9:9.0.27-jdk8-openjdk
+          name: tomcat9:${TOMCAT_VERSION}-jdk8-openjdk
       type: Docker
     triggers:
     - type: ConfigChange
@@ -81,10 +81,10 @@ parameters:
 - description: A suffix appended to all objects
   name: SUFFIX
   value: -build
-- name: TOMCAT_IMAGE_TAG
+- name: TOMCAT_VERSION
   value: "9.0.27"
-- name: OUTPUT_IMAGE_TAG
-  value: "9.0.27-build"
+- name: IMAGE_TAG_SUFFIX
+  value: "-latest"
 - name: SOURCE_GIT_URL
   required: true
   value: https://github.com/BCDevOps/ha-tomcat9.git
