@@ -21,4 +21,3 @@ RUN set -xe && \
     apt-get remove -qq -y --purge patch && apt-get clean && set +x && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
 
 VOLUME [ "/usr/local/tomcat/ext/webade/lib", "/usr/local/tomcat/ext/webade/classes" ]
-VOLUME [ "/usr/local/tomcat/webapps" ]
