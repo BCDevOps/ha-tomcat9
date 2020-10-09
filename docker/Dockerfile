@@ -9,6 +9,7 @@ RUN set -xe && \
     mkdir -p /usr/local/tomcat/conf/Catalina/localhost && \
     chmod g+w /usr/local/tomcat/conf/Catalina/localhost && \
     chmod g+w /usr/local/tomcat/webapps && \
+    ls -la /usr/local/tomcat/ && \
     ( cd /usr/local/tomcat && sha1sum --check /usr/local/tomcat/tomcat.sha1 --status) && \
     patch --batch --forward --unified  --strip=1 --directory=/usr/local/tomcat --input=/usr/local/tomcat/tomcat.patch && \
     mkdir -p /usr/local/tomcat/log4j2/lib /usr/local/tomcat/log4j2/conf && \
