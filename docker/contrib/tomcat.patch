@@ -64,8 +64,8 @@ diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclud
 +
 diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclude=logs --exclude=webapps -ru ../.tomcat-original/bin/setenv.sh ./bin/setenv.sh
 --- ../.tomcat-original/bin/setenv.sh	1969-12-31 16:00:00.000000000 -0800
-+++ ./bin/setenv.sh	2020-10-05 21:14:37.000000000 -0700
-@@ -0,0 +1,34 @@
++++ ./bin/setenv.sh	2020-10-19 21:01:00.000000000 -0700
+@@ -0,0 +1,36 @@
 +CLASSPATH="$CATALINA_HOME/log4j2/lib/*:$CATALINA_HOME/log4j2/conf"
 +# Reserve 10MB from the available memory
 +CATALINA_OPTS="-XshowSettings:vm $CATALINA_OPTS"
@@ -94,6 +94,8 @@ diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclud
 +if [ ! -z "$CATALINA_COMMON_LOADER_APPEND" ]; then
 +  CATALINA_OPTS="$CATALINA_OPTS '-Dcommon.loader.append=${CATALINA_COMMON_LOADER_APPEND}'"
 +fi
++
++CATALINA_OPTS="$CATALINA_OPTS '-Dwebade-preference-file-location=ext/webade/classes/webade-preferences.xml'"
 +
 +DEFAULT_CATALINA_OPTS='-Dorg.apache.tomcat.util.digester.PROPERTY_SOURCE=org.apache.tomcat.util.digester.Digester\$EnvironmentPropertySource -Djava.security.egd=file:/dev/./urandom'
 +if [ -z PROXY_HOST ] 
@@ -180,11 +182,11 @@ diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclud
 \ No newline at end of file
 diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclude=logs --exclude=webapps -ru ../.tomcat-original/conf/server.xml ./conf/server.xml
 --- ../.tomcat-original/conf/server.xml	2019-10-07 02:59:50.000000000 -0700
-+++ ./conf/server.xml	2020-10-06 09:24:10.000000000 -0700
++++ ./conf/server.xml	2020-10-19 21:13:09.000000000 -0700
 @@ -1,4 +1,8 @@
  <?xml version="1.0" encoding="UTF-8"?>
 +<!DOCTYPE server-xml [
-+    <!ENTITY server-cluster SYSTEM "server-cluster-none.xml">
++    <!ENTITY server-cluster SYSTEM "server-cluster-k8s.xml">
 +    <!ENTITY connector-http1-proxy SYSTEM "server-connector-http1-proxy.xml">
 +]>
  <!--
