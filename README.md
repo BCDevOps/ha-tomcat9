@@ -12,22 +12,37 @@ Highly Available Tomcat 9 Image
        -> Update your application build.yaml to use this image for hosting your java application 
        -> Update your application deployment.yaml to add the rbac authorizations and roles required to run the tomcat in a cluster and don't forget to add the service account required to run your container under the spec.
 
-#### Note: To run with existing docker configuration, you will not be needed to make any changes to the docker folder
+#### Note: To run with existing docker configuration, you will not need to make any changes to the docker folder
 
-# How to build image
-## In Openshift
+# Building & Deploying the Image
+## In Openshift (via developer CLI)
 ```
-# NOTE: Switch to target namespace, or set `-n <namespace>` on all `oc` commands
-# oc project ywinub-tools
+NOTE: Switch to target namespace, or set `-n perrsi-tools` on all `oc` commands
+    oc project perrsi-tools
 
-# Process template, and create OpenShift resources
-oc -n ywinub-tools process -f openshift/build.yaml SUFFIX=-cvarjao IMAGE_TAG_SUFFIX=-cvarjao | oc -n ywinub-tools create -f -
+Process template, and create OpenShift resources
+    oc process -f openshift/build.yaml VERSION=0.1 SUFFIX=-6 SOURCE_GIT_REF=/refs/pull/6/head | oc apply -f -
 
-# Start a new build using the current repository in the working directory as source
-oc -n ywinub-tools start-build bc/ha-tomcat9-cvarjao --from-repo=.
+VERSION and SUFFIX tag images using the pull request number and an incrementing major-minor version pair.
+  -> If this is a bugfix, do not increment the version.
+  -> If it is a major, breaking change, increment the major version.
+  -> If it is a simple feature addition, increment the minor version.
+If you are just running a one-off or experiment, you can use your name/idir or 'build' as a version and omit the suffix.
 
-# NOTE: it includes all commits done locally, but not yet pushed
-#       if all commits are already pushed, there is no need for `--from-repo=.`
+SOURCE_GIT_REF specifies which git branch will be used in the build.
+  -> If you have a pull request open, you can use /refs/pull/#/head .
+  -> If you have committed the changes to github, you can use the branch name.
+  -> If you want to start a new build using the current repository in the working directory as source:
+    oc start-build bc/ha-tomcat9-0.1-6 --from-repo=.
+
+NOTE: This includes all commits done locally, but not yet pushed.
+      If all commits are already pushed, there is no need for `--from-repo=.`
+
+When making the image available in perrsi-prod, we update the version tag (without git pull #) to this new image.
+We also update the 'latest' tag to this image.
+
+    oc tag perrsi-tools/ha-tomcat9:0.1-6 perrsi-prod/ha-tomcat9:0.1 --reference-policy=local
+    oc tag perrsi-tools/ha-tomcat9:0.1-6 perrsi-prod/ha-tomcat9:latest --reference-policy=local
 ```
 
 ## Locally
@@ -36,7 +51,7 @@ oc -n ywinub-tools start-build bc/ha-tomcat9-cvarjao --from-repo=.
 -- TBD --
 
 ### Build
-if you are working ont he Dockerfile and the image itself, you may want to build locally using docker
+If you are working on the Dockerfile and the image itself, you may want to build locally using docker
 ```
 cd docker
 docker build -t ha-tomcat9:latest .
