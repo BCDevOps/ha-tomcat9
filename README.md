@@ -15,6 +15,21 @@ Highly Available Tomcat 9 Image
 #### Note: To run with existing docker configuration, you will not need to make any changes to the docker folder
 
 # Building & Deploying the Image
+## In Openshift (using NRDK)
+```
+# Build a image based on HEAD of pull request
+npx @bcgov/nrdk build --pr=<number>
+
+# Deploy the image previously built by a specific PR to "DEV"
+npx @bcgov/nrdk deploy --pr=<number> --env=dev
+
+# Deploy the image previously built by a specific PR to "TEST"
+npx @bcgov/nrdk deploy --pr=<number> --env=test
+
+# Deploy the image previously built by a specific PR to "PROD"
+npx @bcgov/nrdk deploy --pr=<number> --env=prod
+```
+
 ## In Openshift (via developer CLI)
 ```
 NOTE: Switch to target namespace, or set `-n perrsi-tools` on all `oc` commands

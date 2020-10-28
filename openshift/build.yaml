@@ -43,14 +43,14 @@ objects:
     creationTimestamp: null
     labels:
       build: ${NAME}
-    name: ${NAME}-${VERSION}${SUFFIX}
+    name: ${NAME}${SUFFIX}
   spec:
     nodeSelector: null
     runPolicy: SerialLatestOnly
     output:
       to:
         kind: ImageStreamTag
-        name: ${NAME}:${VERSION}${SUFFIX}
+        name: ${NAME}:${VERSION}
     postCommit: {}
     resources: {}
     source:
