@@ -169,15 +169,17 @@ diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclud
 \ No newline at end of file
 diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclude=logs --exclude=webapps -ru ../.tomcat-original/conf/server-connector-http1-proxy.xml ./conf/server-connector-http1-proxy.xml
 --- ../.tomcat-original/conf/server-connector-http1-proxy.xml	1969-12-31 16:00:00.000000000 -0800
-+++ ./conf/server-connector-http1-proxy.xml	2020-10-05 23:16:02.000000000 -0700
-@@ -0,0 +1,8 @@
++++ ./conf/server-connector-http1-proxy.xml	2020-10-28 19:33:28.000000000 -0700
+@@ -0,0 +1,10 @@
 +<Connector
 +  port="8080"
-+  proxyPort="80"
++  proxyPort="443"
 +  proxyName="${PROXY_HOST}"
 +  protocol="HTTP/1.1"
 +  connectionTimeout="40000"
 +  redirectPort="8443"
++  scheme="https"
++  secure="true"
 +/> 
 \ No newline at end of file
 diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclude=logs --exclude=webapps -ru ../.tomcat-original/conf/server.xml ./conf/server.xml
