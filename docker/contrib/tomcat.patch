@@ -1,6 +1,6 @@
-diff --new-file -ru ../original/bin/catalina.sh ./bin/catalina.sh
---- ../original/bin/catalina.sh	2019-11-22 11:42:32.000000000 -0800
-+++ ./bin/catalina.sh	2020-03-09 13:58:37.000000000 -0700
+diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclude=logs --exclude=webapps -ru ../.tomcat-original/bin/catalina.sh ./bin/catalina.sh
+--- ../.tomcat-original/bin/catalina.sh	2019-10-07 02:57:58.000000000 -0700
++++ ./bin/catalina.sh	2020-10-05 20:14:57.000000000 -0700
 @@ -354,7 +354,7 @@
          echo "Using Security Manager"
        fi
@@ -62,23 +62,50 @@ diff --new-file -ru ../original/bin/catalina.sh ./bin/catalina.sh
 +
 +
 +
-diff --new-file -ru ../original/bin/setenv.sh ./bin/setenv.sh
---- ../original/bin/setenv.sh	1969-12-31 16:00:00.000000000 -0800
-+++ ./bin/setenv.sh	2020-03-24 12:31:27.000000000 -0700
-@@ -0,0 +1,9 @@
+diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclude=logs --exclude=webapps -ru ../.tomcat-original/bin/setenv.sh ./bin/setenv.sh
+--- ../.tomcat-original/bin/setenv.sh	1969-12-31 16:00:00.000000000 -0800
++++ ./bin/setenv.sh	2020-10-19 21:01:00.000000000 -0700
+@@ -0,0 +1,36 @@
 +CLASSPATH="$CATALINA_HOME/log4j2/lib/*:$CATALINA_HOME/log4j2/conf"
 +# Reserve 10MB from the available memory
-+CATALINA_OPTS="-XshowSettings:vm  -XX:MaxRAM=$(( $(cat /sys/fs/cgroup/memory/memory.limit_in_bytes) - ( 1024 * 10) )) -XX:MaxRAMPercentage=100.0 $CATALINA_OPTS"
-+CATALINA_OPTS="-javaagent:$CATALINA_HOME/bin/jolokia-jvm-1.6.2-agent.jar=port=7070,host=localhost,discoveryEnabled=false $CATALINA_OPTS"
++CATALINA_OPTS="-XshowSettings:vm $CATALINA_OPTS"
++if [ -e /sys/fs/cgroup/memory/memory.limit_in_bytes ]; then
++  CATALINA_OPTS="-XX:MaxRAM=$(( $(cat /sys/fs/cgroup/memory/memory.limit_in_bytes) - ( 1024 * 10) )) -XX:MaxRAMPercentage=100.0 ${CATALINA_OPTS}"
++fi
++
++if [ -e "$CATALINA_HOME/bin/jolokia-jvm-1.6.2-agent.jar" ]; then
++  CATALINA_OPTS="-javaagent:$CATALINA_HOME/bin/jolokia-jvm-1.6.2-agent.jar=port=7070,host=localhost,discoveryEnabled=false $CATALINA_OPTS"
++fi
++
++CATALINA_COMMON_LOADER_APPEND=''
++if [ -e "$CATALINA_HOME/ext" ]; then
++  for line in $(find "$CATALINA_HOME/ext" -type d -maxdepth 2 \( -name lib -o -name classes \)); do
++    if [ ! -z "$CATALINA_COMMON_LOADER_APPEND" ]; then
++      CATALINA_COMMON_LOADER_APPEND="${CATALINA_COMMON_LOADER_APPEND},"
++    fi
++    if [[ $line == */lib ]]; then
++      CATALINA_COMMON_LOADER_APPEND="${CATALINA_COMMON_LOADER_APPEND}\"$line/*.jar\""
++    else # it is classes
++      CATALINA_COMMON_LOADER_APPEND="${CATALINA_COMMON_LOADER_APPEND}\"$line\""
++    fi
++  done
++fi
++
++if [ ! -z "$CATALINA_COMMON_LOADER_APPEND" ]; then
++  CATALINA_OPTS="$CATALINA_OPTS '-Dcommon.loader.append=${CATALINA_COMMON_LOADER_APPEND}'"
++fi
++
++CATALINA_OPTS="$CATALINA_OPTS '-Dwebade-preference-file-location=ext/webade/classes/webade-preferences.xml'"
++
 +DEFAULT_CATALINA_OPTS='-Dorg.apache.tomcat.util.digester.PROPERTY_SOURCE=org.apache.tomcat.util.digester.Digester\$EnvironmentPropertySource -Djava.security.egd=file:/dev/./urandom'
 +if [ -z PROXY_HOST ] 
 +then
 +  exit 1
 +fi
 \ No newline at end of file
-diff --new-file -ru ../original/bin/unpack-webapps.sh ./bin/unpack-webapps.sh
---- ../original/bin/unpack-webapps.sh	1969-12-31 16:00:00.000000000 -0800
-+++ ./bin/unpack-webapps.sh	2020-03-11 10:10:15.000000000 -0700
+diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclude=logs --exclude=webapps -ru ../.tomcat-original/bin/unpack-webapps.sh ./bin/unpack-webapps.sh
+--- ../.tomcat-original/bin/unpack-webapps.sh	1969-12-31 16:00:00.000000000 -0800
++++ ./bin/unpack-webapps.sh	2020-10-05 20:14:57.000000000 -0700
 @@ -0,0 +1,9 @@
 +#!/usr/bin/env bash
 +set -e
@@ -89,17 +116,92 @@ diff --new-file -ru ../original/bin/unpack-webapps.sh ./bin/unpack-webapps.sh
 +find ./webapps/ -maxdepth 1 -name '*.war' | xargs basename -s .war | xargs -t -I {} mkdir 'webapps/{}'
 +find ./webapps/ -maxdepth 1 -name '*.war' | xargs basename -s .war | xargs -t -I {} unzip -n -qq '/usr/local/tomcat/webapps/{}.war' -d 'webapps/{}'
 +find ./webapps/ -maxdepth 1 -name '*.war' | xargs -t -I {} rm '{}'
-diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
---- ../original/conf/server.xml	2020-03-11 09:22:10.000000000 -0700
-+++ ./conf/server.xml	2020-03-24 13:20:05.000000000 -0700
-@@ -66,14 +66,13 @@
+diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclude=logs --exclude=webapps -ru ../.tomcat-original/conf/catalina.properties ./conf/catalina.properties
+--- ../.tomcat-original/conf/catalina.properties	2019-10-07 02:59:50.000000000 -0700
++++ ./conf/catalina.properties	2020-10-05 21:07:56.000000000 -0700
+@@ -50,7 +50,11 @@
+ #       ${catalina.base} path or the ${catalina.home} path contains a comma.
+ #       Because double quotes are used for quoting, the double quote character
+ #       may not appear in a path.
+-common.loader="${catalina.base}/lib","${catalina.base}/lib/*.jar","${catalina.home}/lib","${catalina.home}/lib/*.jar"
++common.loader="${catalina.base}/lib",\
++"${catalina.base}/lib/*.jar",\
++"${catalina.home}/lib",\
++"${catalina.home}/lib/*.jar",\
++${common.loader.append}
+ 
+ #
+ # List of comma-separated paths defining the contents of the "server"
+diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclude=logs --exclude=webapps -ru ../.tomcat-original/conf/server-cluster-k8s.xml ./conf/server-cluster-k8s.xml
+--- ../.tomcat-original/conf/server-cluster-k8s.xml	1969-12-31 16:00:00.000000000 -0800
++++ ./conf/server-cluster-k8s.xml	2020-10-05 23:10:46.000000000 -0700
+@@ -0,0 +1,18 @@
++<Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster" channelSendOptions="6">
++  <Manager className="org.apache.catalina.ha.session.BackupManager"
++             expireSessionsOnShutdown="false"
++             notifyListenersOnReplication="true"/>
++    <Channel className="org.apache.catalina.tribes.group.GroupChannel">
++        <Membership className="org.apache.catalina.tribes.membership.cloud.CloudMembershipService"
++                   expirationTime="15000"/>
++       <Interceptor className="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor"/>
++    </Channel>
++    <Valve className="org.apache.catalina.ha.tcp.ReplicationValve"
++           filter=".*\.gif;.*\.js;.*\.jpg;.*\.htm;.*\.html;.*\.css;.*\.txt"/>
++    <Valve className="org.apache.catalina.valves.RemoteIpValve"
++         internalProxies=".*"
++         remoteIpHeader="x-forwarded-for"
++         proxiesHeader="x-forwarded-by"
++         protocolHeader="x-forwarded-proto" />
++  <ClusterListener className="org.apache.catalina.ha.session.ClusterSessionListener"/>
++</Cluster>
+\ No newline at end of file
+diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclude=logs --exclude=webapps -ru ../.tomcat-original/conf/server-cluster-local.xml ./conf/server-cluster-local.xml
+--- ../.tomcat-original/conf/server-cluster-local.xml	1969-12-31 16:00:00.000000000 -0800
++++ ./conf/server-cluster-local.xml	2020-10-05 23:34:20.000000000 -0700
+@@ -0,0 +1 @@
++<Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"/>
+\ No newline at end of file
+diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclude=logs --exclude=webapps -ru ../.tomcat-original/conf/server-cluster-none.xml ./conf/server-cluster-none.xml
+--- ../.tomcat-original/conf/server-cluster-none.xml	1969-12-31 16:00:00.000000000 -0800
++++ ./conf/server-cluster-none.xml	2020-10-05 23:10:06.000000000 -0700
+@@ -0,0 +1 @@
++<?xml version="1.0" encoding="UTF-8"?>
+\ No newline at end of file
+diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclude=logs --exclude=webapps -ru ../.tomcat-original/conf/server-connector-http1-proxy.xml ./conf/server-connector-http1-proxy.xml
+--- ../.tomcat-original/conf/server-connector-http1-proxy.xml	1969-12-31 16:00:00.000000000 -0800
++++ ./conf/server-connector-http1-proxy.xml	2020-10-28 19:33:28.000000000 -0700
+@@ -0,0 +1,10 @@
++<Connector
++  port="8080"
++  proxyPort="443"
++  proxyName="${PROXY_HOST}"
++  protocol="HTTP/1.1"
++  connectionTimeout="40000"
++  redirectPort="8443"
++  scheme="https"
++  secure="true"
++/> 
+\ No newline at end of file
+diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclude=logs --exclude=webapps -ru ../.tomcat-original/conf/server.xml ./conf/server.xml
+--- ../.tomcat-original/conf/server.xml	2019-10-07 02:59:50.000000000 -0700
++++ ./conf/server.xml	2020-10-19 21:13:09.000000000 -0700
+@@ -1,4 +1,8 @@
+ <?xml version="1.0" encoding="UTF-8"?>
++<!DOCTYPE server-xml [
++    <!ENTITY server-cluster SYSTEM "server-cluster-k8s.xml">
++    <!ENTITY connector-http1-proxy SYSTEM "server-connector-http1-proxy.xml">
++]>
+ <!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+@@ -66,14 +70,13 @@
           APR (HTTP/AJP) Connector: /docs/apr.html
           Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
      -->
 -    <Connector port="8080" protocol="HTTP/1.1"
 -               connectionTimeout="20000"
 -               redirectPort="8443" />
-+    <Connector port="8080" proxyPort="80" proxyName="${PROXY_HOST}" protocol="HTTP/1.1" connectionTimeout="40000" redirectPort="8443" /> 
++    &connector-http1-proxy;
 +    <!-- <Connector port="8080" protocol="HTTP/1.1" connectionTimeout="40000" redirectPort="8443" /> -->
      <!-- A "Connector" using the shared thread pool-->
      <!--
@@ -110,7 +212,7 @@ diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
                 redirectPort="8443" />
      -->
      <!-- Define an SSL/TLS HTTP/1.1 Connector on port 8443
-@@ -113,7 +112,7 @@
+@@ -113,7 +116,7 @@
      -->
  
      <!-- Define an AJP 1.3 Connector on port 8009 -->
@@ -119,36 +221,16 @@ diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
  
  
      <!-- An Engine represents the entry point (within Catalina) that processes
-@@ -130,9 +129,25 @@
-       <!--For clustering, please take a look at documentation at:
-           /docs/cluster-howto.html  (simple how to)
-           /docs/config/cluster.html (reference documentation) -->
--      <!--
--      <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"/>
--      -->
-+      <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster" channelSendOptions="6">
-+        <Manager className="org.apache.catalina.ha.session.BackupManager"
-+                   expireSessionsOnShutdown="false"
-+                   notifyListenersOnReplication="true"/>
-+          <Channel className="org.apache.catalina.tribes.group.GroupChannel">
-+              <Membership className="org.apache.catalina.tribes.membership.cloud.CloudMembershipService"
-+                         expirationTime="15000"/>
-+
-+             <Interceptor className="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor"/>
-+          </Channel>
-+          <Valve className="org.apache.catalina.ha.tcp.ReplicationValve"
-+                 filter=".*\.gif;.*\.js;.*\.jpg;.*\.htm;.*\.html;.*\.css;.*\.txt"/>
-+          <Valve className="org.apache.catalina.valves.RemoteIpValve"
-+               internalProxies=".*"
-+               remoteIpHeader="x-forwarded-for"
-+               proxiesHeader="x-forwarded-by"
-+               protocolHeader="x-forwarded-proto" />
-+        <ClusterListener className="org.apache.catalina.ha.session.ClusterSessionListener"/>
-+      </Cluster>
- 
+@@ -133,7 +136,7 @@
+       <!--
+       <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"/>
+       -->
+-
++      &server-cluster;
        <!-- Use the LockOutRealm to prevent attempts to guess user passwords
             via a brute-force attack -->
-@@ -146,13 +161,14 @@
+       <Realm className="org.apache.catalina.realm.LockOutRealm">
+@@ -146,13 +149,14 @@
        </Realm>
  
        <Host name="localhost"  appBase="webapps"
@@ -164,9 +246,9 @@ diff --new-file -ru ../original/conf/server.xml ./conf/server.xml
  
          <!-- Access log processes all example.
               Documentation at: /docs/config/valve.html
-diff --new-file -ru ../original/conf/web.xml ./conf/web.xml
---- ../original/conf/web.xml	2019-11-22 11:42:32.000000000 -0800
-+++ ./conf/web.xml	2019-11-22 11:43:40.000000000 -0800
+diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclude=logs --exclude=webapps -ru ../.tomcat-original/conf/web.xml ./conf/web.xml
+--- ../.tomcat-original/conf/web.xml	2019-10-07 02:59:50.000000000 -0700
++++ ./conf/web.xml	2020-10-05 20:14:57.000000000 -0700
 @@ -631,7 +631,7 @@
    <!-- created sessions by modifying the value below.                       -->
  
@@ -176,9 +258,9 @@ diff --new-file -ru ../original/conf/web.xml ./conf/web.xml
      </session-config>
  
  
-diff --new-file -ru ../original/log4j2/conf/log4j2-tomcat.xml ./log4j2/conf/log4j2-tomcat.xml
---- ../original/log4j2/conf/log4j2-tomcat.xml	1969-12-31 16:00:00.000000000 -0800
-+++ ./log4j2/conf/log4j2-tomcat.xml	2019-12-23 13:29:02.000000000 -0800
+diff --new-file --exclude=tomcat-users.xml --exclude=ext --exclude=work --exclude=logs --exclude=webapps -ru ../.tomcat-original/log4j2/conf/log4j2-tomcat.xml ./log4j2/conf/log4j2-tomcat.xml
+--- ../.tomcat-original/log4j2/conf/log4j2-tomcat.xml	1969-12-31 16:00:00.000000000 -0800
++++ ./log4j2/conf/log4j2-tomcat.xml	2020-10-05 20:14:57.000000000 -0700
 @@ -0,0 +1,26 @@
 +<Configuration status="error"> 
 +    <Properties>

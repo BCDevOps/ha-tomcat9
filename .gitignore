@@ -24,3 +24,5 @@ hs_err_pid*
 docker/contrib/original/**
 docker/contrib/patched/**
 log4j2-tomcat.xml.rej
+docker/.tomcat/**
+docker/.tomcat-original/**

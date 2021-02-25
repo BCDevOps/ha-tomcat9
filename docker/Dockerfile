@@ -9,6 +9,7 @@ RUN set -xe && \
     mkdir -p /usr/local/tomcat/conf/Catalina/localhost && \
     chmod g+w /usr/local/tomcat/conf/Catalina/localhost && \
     chmod g+w /usr/local/tomcat/webapps && \
+    ls -la /usr/local/tomcat/ && \
     ( cd /usr/local/tomcat && sha1sum --check /usr/local/tomcat/tomcat.sha1 --status) && \
     patch --batch --forward --unified  --strip=1 --directory=/usr/local/tomcat --input=/usr/local/tomcat/tomcat.patch && \
     mkdir -p /usr/local/tomcat/log4j2/lib /usr/local/tomcat/log4j2/conf && \
@@ -18,3 +19,5 @@ RUN set -xe && \
     rm /usr/local/tomcat/conf/logging.properties && \
     curl -sSL https://repo1.maven.org/maven2/org/jolokia/jolokia-jvm/1.6.2/jolokia-jvm-1.6.2-agent.jar -o /usr/local/tomcat/bin/jolokia-jvm-1.6.2-agent.jar && \
     apt-get remove -qq -y --purge patch && apt-get clean && set +x && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
+
+VOLUME [ "/usr/local/tomcat/ext/webade/lib", "/usr/local/tomcat/ext/webade/classes", "/usr/local/tomcat/ext/keycloak/classes" ]
