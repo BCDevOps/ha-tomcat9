@@ -171,24 +171,26 @@ diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '-
 +/>
 diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '--exclude=*.log' '--exclude=logs' '--exclude=webapps' -ru ../.tomcat-original/conf/server.xml ./conf/server.xml
 --- ../.tomcat-original/conf/server.xml	2019-10-07 02:59:50.000000000 -0700
-+++ ./conf/server.xml	2021-02-25 14:36:45.253335700 -0800
-@@ -1,4 +1,8 @@
++++ ./conf/server.xml	2021-02-25 20:02:21.491669500 -0800
+@@ -1,4 +1,9 @@
  <?xml version="1.0" encoding="UTF-8"?>
 +<!DOCTYPE server-xml [
 +    <!ENTITY server-cluster SYSTEM "server-cluster-k8s.xml">
-+    <!ENTITY connector-http1-proxy SYSTEM "./connector/main.xml">
++    <!ENTITY connector-http SYSTEM "./connector/http.xml">
++    <!ENTITY connector-https SYSTEM "./connector/https.xml">
 +]>
  <!--
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
-@@ -66,14 +70,13 @@
+@@ -66,14 +71,14 @@
           APR (HTTP/AJP) Connector: /docs/apr.html
           Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
      -->
 -    <Connector port="8080" protocol="HTTP/1.1"
 -               connectionTimeout="20000"
 -               redirectPort="8443" />
-+    &connector-http1-proxy;
++    &connector-http;
++    &connector-https;
 +    <!-- <Connector port="8080" protocol="HTTP/1.1" connectionTimeout="40000" redirectPort="8443" /> -->
      <!-- A "Connector" using the shared thread pool-->
      <!--
@@ -199,7 +201,7 @@ diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '-
                 redirectPort="8443" />
      -->
      <!-- Define an SSL/TLS HTTP/1.1 Connector on port 8443
-@@ -113,7 +116,7 @@
+@@ -113,7 +118,7 @@
      -->
  
      <!-- Define an AJP 1.3 Connector on port 8009 -->
@@ -208,7 +210,7 @@ diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '-
  
  
      <!-- An Engine represents the entry point (within Catalina) that processes
-@@ -133,7 +136,7 @@
+@@ -133,7 +138,7 @@
        <!--
        <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"/>
        -->
@@ -217,7 +219,7 @@ diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '-
        <!-- Use the LockOutRealm to prevent attempts to guess user passwords
             via a brute-force attack -->
        <Realm className="org.apache.catalina.realm.LockOutRealm">
-@@ -146,13 +149,14 @@
+@@ -146,13 +151,14 @@
        </Realm>
  
        <Host name="localhost"  appBase="webapps"
