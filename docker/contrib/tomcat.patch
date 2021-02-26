@@ -64,7 +64,7 @@ diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '-
 +
 diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '--exclude=*.log' '--exclude=logs' '--exclude=webapps' -ru ../.tomcat-original/bin/setenv.sh ./bin/setenv.sh
 --- ../.tomcat-original/bin/setenv.sh	1969-12-31 16:00:00.000000000 -0800
-+++ ./bin/setenv.sh	2021-02-25 16:09:07.289046400 -0800
++++ ./bin/setenv.sh	2021-02-25 16:09:29.320686800 -0800
 @@ -0,0 +1,45 @@
 +# variables needed by Tomncat xml configurtaion need to be exported
 +export CONNECTOR_SCHEME="${CONNECTOR_SCHEME:-https}"
@@ -141,19 +141,33 @@ diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '-
  
  #
  # List of comma-separated paths defining the contents of the "server"
-diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '--exclude=*.log' '--exclude=logs' '--exclude=webapps' -ru ../.tomcat-original/conf/connector/main.xml ./conf/connector/main.xml
---- ../.tomcat-original/conf/connector/main.xml	1969-12-31 16:00:00.000000000 -0800
-+++ ./conf/connector/main.xml	2021-02-25 16:08:40.164050400 -0800
+diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '--exclude=*.log' '--exclude=logs' '--exclude=webapps' -ru ../.tomcat-original/conf/connector/http.xml ./conf/connector/http.xml
+--- ../.tomcat-original/conf/connector/http.xml	1969-12-31 16:00:00.000000000 -0800
++++ ./conf/connector/http.xml	2021-02-25 17:52:13.409226400 -0800
 @@ -0,0 +1,10 @@
 +<Connector
-+  port="${CONNECTOR_PORT}"
-+  proxyPort="${CONNECTOR_PROXY_PORT}"
++  port="8080"
++  proxyPort="443"
 +  proxyName="${PROXY_HOST}"
 +  protocol="HTTP/1.1"
 +  connectionTimeout="40000"
 +  redirectPort="8443"
-+  scheme="${CONNECTOR_SCHEME}"
-+  secure="${CONNECTOR_SECURE}"
++  scheme="http"
++  secure="false"
++/>
+diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '--exclude=*.log' '--exclude=logs' '--exclude=webapps' -ru ../.tomcat-original/conf/connector/https.xml ./conf/connector/https.xml
+--- ../.tomcat-original/conf/connector/https.xml	1969-12-31 16:00:00.000000000 -0800
++++ ./conf/connector/https.xml	2021-02-25 17:52:03.112222300 -0800
+@@ -0,0 +1,10 @@
++<Connector
++  port="8443"
++  proxyPort="443"
++  proxyName="${PROXY_HOST}"
++  protocol="HTTP/1.1"
++  connectionTimeout="40000"
++  redirectPort="8443"
++  scheme="https"
++  secure="true"
 +/>
 diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '--exclude=*.log' '--exclude=logs' '--exclude=webapps' -ru ../.tomcat-original/conf/server.xml ./conf/server.xml
 --- ../.tomcat-original/conf/server.xml	2019-10-07 02:59:50.000000000 -0700
@@ -221,7 +235,7 @@ diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '-
               Documentation at: /docs/config/valve.html
 diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '--exclude=*.log' '--exclude=logs' '--exclude=webapps' -ru ../.tomcat-original/conf/server-cluster-k8s.xml ./conf/server-cluster-k8s.xml
 --- ../.tomcat-original/conf/server-cluster-k8s.xml	1969-12-31 16:00:00.000000000 -0800
-+++ ./conf/server-cluster-k8s.xml	2021-02-25 13:52:15.798667000 -0800
++++ ./conf/server-cluster-k8s.xml	2021-02-25 19:50:09.554300700 -0800
 @@ -0,0 +1,18 @@
 +<Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster" channelSendOptions="6">
 +  <Manager className="org.apache.catalina.ha.session.BackupManager"
@@ -229,7 +243,7 @@ diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '-
 +             notifyListenersOnReplication="true"/>
 +    <Channel className="org.apache.catalina.tribes.group.GroupChannel">
 +        <Membership className="org.apache.catalina.tribes.membership.cloud.CloudMembershipService"
-+                   expirationTime="15000"/>
++                   expirationTime="15000" readTimeout="15001" connectTimeout="15002"/>
 +       <Interceptor className="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor"/>
 +    </Channel>
 +    <Valve className="org.apache.catalina.ha.tcp.ReplicationValve"
