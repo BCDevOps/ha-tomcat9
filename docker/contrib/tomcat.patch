@@ -64,12 +64,13 @@ diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '-
 +
 diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '--exclude=*.log' '--exclude=logs' '--exclude=webapps' -ru ../.tomcat-original/bin/setenv.sh ./bin/setenv.sh
 --- ../.tomcat-original/bin/setenv.sh	1969-12-31 16:00:00.000000000 -0800
-+++ ./bin/setenv.sh	2021-02-25 14:47:13.991466300 -0800
-@@ -0,0 +1,44 @@
++++ ./bin/setenv.sh	2021-02-25 16:09:07.289046400 -0800
+@@ -0,0 +1,45 @@
 +# variables needed by Tomncat xml configurtaion need to be exported
 +export CONNECTOR_SCHEME="${CONNECTOR_SCHEME:-https}"
 +export CONNECTOR_SECURE="${CONNECTOR_SECURE:-true}"
 +export CONNECTOR_PORT="${CONNECTOR_PORT:-8080}"
++export CONNECTOR_PROXY_PORT="${CONNECTOR_PROXY_PORT:-443}"
 +
 +# variables used internaly in this shell script, do NOT need to be exported
 +: "${APPLY_LIMIT_FROM_CGROUPS:=true}"
@@ -142,11 +143,11 @@ diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '-
  # List of comma-separated paths defining the contents of the "server"
 diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '--exclude=*.log' '--exclude=logs' '--exclude=webapps' -ru ../.tomcat-original/conf/connector/main.xml ./conf/connector/main.xml
 --- ../.tomcat-original/conf/connector/main.xml	1969-12-31 16:00:00.000000000 -0800
-+++ ./conf/connector/main.xml	2021-02-25 14:41:30.438843100 -0800
++++ ./conf/connector/main.xml	2021-02-25 16:08:40.164050400 -0800
 @@ -0,0 +1,10 @@
 +<Connector
 +  port="${CONNECTOR_PORT}"
-+  proxyPort="443"
++  proxyPort="${CONNECTOR_PROXY_PORT}"
 +  proxyName="${PROXY_HOST}"
 +  protocol="HTTP/1.1"
 +  connectionTimeout="40000"
