@@ -64,8 +64,8 @@ diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '-
 +
 diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '--exclude=*.log' '--exclude=logs' '--exclude=webapps' -ru ../.tomcat-original/bin/setenv.sh ./bin/setenv.sh
 --- ../.tomcat-original/bin/setenv.sh	1969-12-31 16:00:00.000000000 -0800
-+++ ./bin/setenv.sh	2021-02-25 16:09:29.320686800 -0800
-@@ -0,0 +1,45 @@
++++ ./bin/setenv.sh	2021-03-25 15:20:40.508147900 -0700
+@@ -0,0 +1,50 @@
 +# variables needed by Tomncat xml configurtaion need to be exported
 +export CONNECTOR_SCHEME="${CONNECTOR_SCHEME:-https}"
 +export CONNECTOR_SECURE="${CONNECTOR_SECURE:-true}"
@@ -107,6 +107,11 @@ diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '-
 +CATALINA_OPTS="$CATALINA_OPTS '-Dwebade-preference-file-location=ext/webade/classes/webade-preferences.xml'"
 +
 +DEFAULT_CATALINA_OPTS='-Dorg.apache.tomcat.util.digester.PROPERTY_SOURCE=org.apache.tomcat.util.digester.Digester\$EnvironmentPropertySource -Djava.security.egd=file:/dev/./urandom'
++
++if [ ! -z HOSTNAME ]; then
++  DEFAULT_CATALINA_OPTS="$DEFAULT_CATALINA_OPTS '-Dcatalina.hostname=${HOSTNAME}'"
++fi
++
 +if [ -z PROXY_HOST ] 
 +then
 +  exit 1
@@ -171,7 +176,7 @@ diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '-
 +/>
 diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '--exclude=*.log' '--exclude=logs' '--exclude=webapps' -ru ../.tomcat-original/conf/server.xml ./conf/server.xml
 --- ../.tomcat-original/conf/server.xml	2019-10-07 02:59:50.000000000 -0700
-+++ ./conf/server.xml	2021-02-25 20:02:21.491669500 -0800
++++ ./conf/server.xml	2021-03-25 15:36:26.727558100 -0700
 @@ -1,4 +1,9 @@
  <?xml version="1.0" encoding="UTF-8"?>
 +<!DOCTYPE server-xml [
@@ -219,7 +224,7 @@ diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '-
        <!-- Use the LockOutRealm to prevent attempts to guess user passwords
             via a brute-force attack -->
        <Realm className="org.apache.catalina.realm.LockOutRealm">
-@@ -146,13 +151,14 @@
+@@ -146,19 +151,20 @@
        </Realm>
  
        <Host name="localhost"  appBase="webapps"
@@ -231,10 +236,17 @@ diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '-
          <!--
          <Valve className="org.apache.catalina.authenticator.SingleSignOn" />
          -->
-+ 
++        <Valve className="org.apache.catalina.valves.StuckThreadDetectionValve" threshold="30" />
  
          <!-- Access log processes all example.
               Documentation at: /docs/config/valve.html
+              Note: The pattern used is equivalent to using pattern="common" -->
+         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+-               prefix="localhost_access_log" suffix=".txt"
++               prefix="${catalina.hostname}_access_log" suffix=".txt"
+                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+ 
+       </Host>
 diff --new-file '--exclude=tomcat-users.xml' '--exclude=ext' '--exclude=work' '--exclude=*.log' '--exclude=logs' '--exclude=webapps' -ru ../.tomcat-original/conf/server-cluster-k8s.xml ./conf/server-cluster-k8s.xml
 --- ../.tomcat-original/conf/server-cluster-k8s.xml	1969-12-31 16:00:00.000000000 -0800
 +++ ./conf/server-cluster-k8s.xml	2021-02-25 19:50:09.554300700 -0800
