@@ -15,7 +15,7 @@ module.exports = exports = class Config {
     const changeId = options.pr //aka pull-request
     const version = '0.1'
     const name = 'ha-tomcat9'
-    const namespace = { build: 'perrsi-tools', dev: 'perrsi-dev', test: 'perrsi-prod', prod: 'perrsi-prod' }
+    const namespace = { build: 'c2053d-tools', dev: 'c2053d-dev', test: 'c2053d-prod', prod: 'c2053d-prod' }
 
     const phases0 = {
         namespace,
