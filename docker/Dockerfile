@@ -1,5 +1,5 @@
 FROM tomcat:9.0.27-jdk8-openjdk
-ARG LOG4J_VERSION=2.12.1
+ARG LOG4J_VERSION=2.17.0
 COPY contrib/tomcat.patch /usr/local/tomcat/
 COPY contrib/tomcat.sha1 /usr/local/tomcat/
 RUN set -xe && \
