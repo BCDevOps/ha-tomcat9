@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: Template
+metadata: {}
+objects:
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    name: tomcat9
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+      - annotations: null
+        from:
+          kind: DockerImage
+          name: 'tomcat:${TOMCAT_VERSION}-jdk8-openjdk'
+        generation: 1
+        importPolicy: {}
+        name: ${TOMCAT_VERSION}-jdk8-openjdk
+        referencePolicy:
+          type: Local
+  status:
+    dockerImageRepository: ''
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewBuild
+    creationTimestamp: null
+    labels:
+      build: ${NAME}
+    name: ${NAME}
+  spec:
+    lookupPolicy:
+      local: false
+  status:
+    dockerImageRepository: ""
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewBuild
+    creationTimestamp: null
+    labels:
+      build: ${NAME}
+    name: ${NAME}${SUFFIX}
+  spec:
+    nodeSelector: null
+    runPolicy: SerialLatestOnly
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${NAME}:${VERSION}
+    postCommit: {}
+    resources: {}
+    source:
+      contextDir: docker
+      git:
+        ref: ${SOURCE_GIT_REF}
+        uri: ${SOURCE_GIT_URL}
+      type: Git
+    strategy:
+      dockerStrategy:
+        imageOptimizationPolicy: SkipLayers
+        from:
+          kind: ImageStreamTag
+          name: tomcat9:${TOMCAT_VERSION}-jdk8-openjdk
+      type: Docker
+    triggers:
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+  status:
+    lastVersion: 0
+parameters:
+- description: Name used for all created objects
+  displayName: Name
+  name: NAME
+  value: ha-tomcat9
+  required: true
+- name: TOMCAT_VERSION
+  value: "9.0.27"
+- name: SUFFIX
+  description: A suffix appended to all objects
+- name: VERSION
+  description: The major and minor version of this image.
+  required: true
+- name: SOURCE_GIT_URL
+  description: Source Git URL
+  value: https://github.com/BCDevOps/ha-tomcat9.git
+  required: true
+- name: SOURCE_GIT_REF
+  description: Source Git Branch
+  value: master
+  required: true
